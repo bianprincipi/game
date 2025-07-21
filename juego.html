@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feliz Día del Amigo - Versión Picante</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      overflow: hidden;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      color: #d72631;
+      margin-bottom: 10px;
+    }
+    #gameArea {
+      position: relative;
+      width: 90vw;
+      max-width: 600px;
+      height: 400px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .emoji {
+      position: absolute;
+      font-size: 30px;
+      cursor: pointer;
+      user-select: none;
+      animation: fall linear;
+    }
+    @keyframes fall {
+      0% { top: -40px; }
+      100% { top: 440px; }
+    }
+    #score {
+      margin-top: 15px;
+      font-size: 20px;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 22px;
+      color: #1d3557;
+      font-weight: bold;
+      display: none;
+    }
+    button#startBtn {
+      margin-top: 15px;
+      background-color: #e63946;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button#startBtn:hover {
+      background-color: #a61d2a;
+    }
+  </style>
+</head>
+<body>
+
+<h1>¡Feliz Día del Amigo! 🎉</h1>
+<div id="gameArea"></div>
+<div id="score">Berenjenas atrapadas: 0</div>
+<div id="message">🔥 ¡Sos el maestro de las 🍆! Feliz día del amigo 😏</div>
+<button id="startBtn">Comenzar juego</button>
+
+<script>
+  const gameArea = document.getElementById('gameArea');
+  const scoreDisplay = document.getElementById('score');
+  const message = document.getElementById('message');
+  const startBtn = document.getElementById('startBtn');
+
+  let score = 0;
+  let heartsInterval;
+  let gameRunning = false;
+  const targetsToWin = 10;
+  const emojis = ['🍆', '🍌', '🥒']; // Solo 🍆 suma
+
+  function createEmoji() {
+    const emoji = document.createElement('div');
+    emoji.classList.add('emoji');
+
+    const selected = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.textContent = selected;
+
+    emoji.style.left = Math.random() * (gameArea.clientWidth - 30) + 'px';
+    const duration = 3 + Math.random() * 2;
+    emoji.style.animationDuration = duration + 's';
+
+    emoji.addEventListener('animationend', () => {
+      emoji.remove();
+    });
+
+    emoji.addEventListener('click', () => {
+      if (!gameRunning) return;
+      if (selected === '🍆') {
+        score++;
+        scoreDisplay.textContent = `Berenjenas atrapadas: ${score}`;
+        if (score >= targetsToWin) {
+          endGame();
+        }
+      }
+      emoji.remove();
+    });
+
+    gameArea.appendChild(emoji);
+  }
+
+  function startGame() {
+    if (gameRunning) return;
+    score = 0;
+    scoreDisplay.textContent = `Berenjenas atrapadas: ${score}`;
+    message.style.display = 'none';
+    gameArea.innerHTML = ''; // limpia la imagen si quedó
+    gameRunning = true;
+    startBtn.disabled = true;
+    heartsInterval = setInterval(createEmoji, 700);
+  }
+
+  function endGame() {
+    gameRunning = false;
+    clearInterval(heartsInterval);
+    [...gameArea.children].forEach(c => c.remove());
+    showVictoryImage();
+    message.style.display = 'block';
+    startBtn.disabled = false;
+  }
+
+  function showVictoryImage() {
+    const img = document.createElement('img');
+    img.src = 'amigos.jpeg'; // asegúrate de que el archivo esté en la misma carpeta
+    img.alt = 'Amigos';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.style.borderRadius = '20px';
+    gameArea.appendChild(img);
+  }
+
+  startBtn.addEventListener('click', startGame);
+</script>
+
+</body>
+</html>
